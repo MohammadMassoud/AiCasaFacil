@@ -1,0 +1,42 @@
+﻿@page "/produtos"
+@rendermode InteractiveServer
+@inject AiCasaFacil.Application.Interfaces.IProdutoService ProdutoService
+
+<h3>Consulta de Produtos</h3>
+
+<InputText Value="@filtro"
+           ValueChanged="OnFiltroChanged"
+           ValueExpression="() => filtro"
+           class="form-control"
+           placeholder="Digite o código do produto..." />
+
+<br />
+
+@if (produtos == null)
+{
+    <p>Carregando...</p>
+}
+else if (!produtos.Any())
+{
+    <p>Nenhum produto encontrado.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descrição</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in produtos)
+            {
+                <tr>
+                    <td>@p.Codigo</td>
+                    <td>@p.Descricao</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

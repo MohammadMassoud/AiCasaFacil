@@ -1,0 +1,282 @@
+﻿@page "/ImportTeste"
+@rendermode InteractiveServer
+@using AiCasaFacil.Domain.Entities
+@using Microsoft.AspNetCore.Components.Forms
+
+<h3 class="mb-4">Análise de Pedidos</h3>
+<label>CSV ML</label>
+<InputFile OnChange="HandleFileML" class="mb-4" />
+<label>CSV Budi</label>
+<InputFile OnChange="HandleFileBudi" class="mb-4" />
+
+@if (pedidos != null && pedidos.Any() && pedidosBudi==null)
+{
+    <!-- DASHBOARD -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 text-center">
+                <small>Total Pedidos</small>
+                <h5>@pedidos.Count()</h5>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 text-center">
+                <small>Total Vendas</small>
+                <h5>@valorTotalVendas.ToString("C")</h5>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 text-center">
+                <small>Total Custo</small>
+                <h5 class="text-danger">@valorTotalDevido.ToString("C")</h5>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 text-center">
+                <small>Lucro Total</small>
+                <h5 class="text-success">@lucroTotal.ToString("C")</h5>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 text-center">
+                <small>Média Margem</small>
+                <h5>@mediaMargem.ToString("N2") %</h5>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 text-center">
+                <small>Pedidos Flex</small>
+                <h5>@quantidadePedidosFlex</h5>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 text-center">
+                <small>Total Flex</small>
+                <h5>@totalFlex.ToString("C")</h5>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 text-center">
+                <small>Total Taxas</small>
+                <h5>@totalTaxa.ToString("C")</h5>
+            </div>
+        </div>
+
+        @* <div class="col-md-3">
+            <div class="card shadow-sm p-3 text-center">
+                <small>Houve Devolução?</small>
+                <h5 class="@(houveDevolucao ? "text-danger" : "text-success")">
+                    @(houveDevolucao ? "Sim" : "Não")
+                </h5>
+            </div>
+        </div>
+ *@
+    </div>
+
+    <!-- RESUMO POR PRODUTO -->
+    <h4>Resumo por Produto</h4>
+
+    <table class="table table-striped table-hover mb-5">
+        <thead class="table-dark">
+            <tr>
+                <th>Código</th>
+                <th>Produto</th>
+                <th>Quantidade</th>
+                <th>Custo</th>
+                <th>Valor Líquido</th>
+                <th>Lucro</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (dynamic item in resumoPorProduto)
+            {
+                <tr>
+                    <td>@item.Codigo</td>
+                    <td>@item.Produto</td>
+                    <td>@item.Quantidade</td>
+                    <td>@item.Custo.ToString("C")</td>
+                    <td>@item.ValorLiquido.ToString("C")</td>
+                    <td class="@(item.Lucro >= 0 ? "text-success" : "text-danger")">
+                        @item.Lucro.ToString("C")
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- TABELA DETALHADA -->
+    <h4>Pedidos Detalhados</h4>
+
+    <table class="table table-bordered table-sm">
+        <thead class="table-secondary">
+            <tr>
+                <th>Pedido</th>
+                <th>Código</th>
+                <th>Produto</th>
+                <th>Data</th>
+                <th>Qtde</th>
+                <th>Custo</th>
+                <th>Valor Total</th>
+                <th>Valor Líquido</th>
+                <th>Taxas</th>
+                <th>Flex</th>
+                <th>Lucro</th>
+                <th>Margem</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var v in detalhePedidos)
+            {
+                <tr>
+                    <td>@v.NumeroPedido</td>
+                    <td>@v.Codigo</td>
+                    <td>@(v.Produto?.Length > 40 ? v.Produto.Substring(0, 40) : v.Produto)</td>
+                    <td>@v.DataPedido.ToString("dd/MM/yyyy")</td>
+                    <td>@v.Quantidade</td>
+                    <td>@v.Custo.ToString("C")</td>
+                    <td>@v.ValorTotal.ToString("C")</td>
+                    <td>@v.ValorLiquido.ToString("C")</td>
+                    <td>@v.Taxa.ToString("C")</td>
+                    <td>@v.Flex.ToString("C")</td>
+                    <td class="@(v.Lucro >= 0 ? "text-success" : "text-danger")">
+                        @v.Lucro.ToString("C")
+                    </td>
+                    <td>@v.Margem.ToString("N2") %</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+}
+
+@if (comparativoPedidos != null && comparativoPedidos.Any())
+{
+    
+    @if (resumoML.Any())
+    {
+        <h4>Pedidos ML</h4>
+
+        <table class="table table-sm table-bordered">
+            <thead class="table-success">
+                <tr>
+                    <th>Código</th>
+                    <th>Produto</th>
+                    <th>Quantidade</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in resumoML)
+                {
+                    <tr>
+                        <td>@item.Codigo</td>
+                        <td>@item.Produto</td>
+                        <td>@item.Quantidade</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    @if (resumoBudi.Any())
+    {
+        <h4>Pedidos Budi</h4>
+
+        <table class="table table-sm table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <th>Código</th>
+                    <th>Produto</th>
+                    <th>Quantidade</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in resumoBudi)
+                {
+                    <tr>
+                        <td>@item.Codigo</td>
+                        <td>@item.Produto</td>
+                        <td>@item.Quantidade</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    
+    @if (diferencas.Any())
+    {
+        <h4>Divergências</h4>
+
+        <table class="table table-sm table-bordered">
+            <thead class="table-danger">
+                <tr>
+                    <th>Código</th>
+                    <th>Produto</th>
+                    <th>Qtd ML</th>
+                    <th>Qtd Budi</th>
+                    <th>Diferença</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in diferencas)
+                {
+                    <tr>
+                        <td>@item.Codigo</td>
+                        <td>@item.Produto</td>
+                        <td>@item.QtdML</td>
+                        <td>@item.QtdBudi</td>
+                        <td>@(item.QtdML - item.QtdBudi)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    <h4>Comparativo ML x Budi</h4>
+
+    <table class="table table-bordered table-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Pedido</th>
+                <th>Data ML</th>
+                <th>Data Budi</th>
+                <th>ML</th>
+                <th>Budi</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in comparativoPedidos)
+            {
+                <tr>
+                    <td>@item.NumeroPedido</td>
+
+                    <td>
+                        @(item.DataML?.ToString("dd/MM/yyyy") ?? "-")
+                    </td>
+
+                    <td>
+                        @(item.DataBudi?.ToString("dd/MM/yyyy") ?? "-")
+                    </td>
+
+                    <td class="text-center">
+                        @(item.ExisteML ? "✔" : "❌")
+                    </td>
+
+                    <td class="text-center">
+                        @(item.ExisteBudi ? "✔" : "❌")
+                    </td>
+
+                    <td class="@(item.Status == "OK" ? "text-success" : "text-danger")">
+                        @item.Status
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
