@@ -104,12 +104,13 @@ public class CsvPedidoImportService
                     if (produto.Codigo == "BS341" && item.Produto.Contains("5 Uni"))
                     {
                         item.Quantidade = item.Quantidade * 5;
-                        item.Custo = produto.ValorUnitario * item.Quantidade;
                     }
-                    else
+                    else if(produto.Codigo == "BS321")
                     {
-                        item.Custo = produto.ValorUnitario * item.Quantidade;
-                    }
+                        item.Quantidade = item.Quantidade * 2;
+                    }                    
+
+                    item.Custo = produto.ValorUnitario * item.Quantidade;
                 }
                 qtdePacote = qtdePacote>0?qtdePacote-1:qtdePacote;
                 pedido.Itens.Add(item);
@@ -130,6 +131,8 @@ public class CsvPedidoImportService
         {
             var pedido = new PedidosBudi();
             var item = new PedidoBudiItem();
+
+            var pedidoExiste = new PedidosBudi(); ;
             bool PegouPedido = false;
             bool PegouNomeCliente = false;
             bool PegouProduto = false;
@@ -146,14 +149,20 @@ public class CsvPedidoImportService
             {
                 if (row.Cell(9).IsEmpty() || row.Cell(9).GetString().StartsWith("Receiver Name"))
                     continue;
-                //if (PegouProduto && row.Cell(9).GetString().StartsWith("BS"))
-                //{
-                //    PegouProduto= false;
-                //    ExisteMaisProdutos = true;
-                //}
-                // Verifica se o pedido já existe
-                //var pedido = pedidos.FirstOrDefault(p => p.NumeroPedido == numeroPedido);
                 
+                if (row.Cell(15).GetString().StartsWith("20000"))
+                {
+                    pedidoExiste = pedidos.FirstOrDefault(p => p.NumeroPedido == row.Cell(15).GetString());
+                    if (pedidoExiste != null)
+                    {
+                        continue;
+                    }
+                }else if (pedidoExiste != null && !row.Cell(15).GetString().StartsWith("20000") && !row.Cell(9).GetString().StartsWith("Pedido"))
+                {
+                    continue;
+                }
+
+                pedidoExiste = null;
                 if (!PegouPedido && !PegouNomeCliente && !PegouProduto && !row.Cell(9).GetString().StartsWith("BS"))
                 {
                     pedido = new PedidosBudi();                    
@@ -198,9 +207,9 @@ public class CsvPedidoImportService
                 }
 
                 if (!PegouProduto)
-                {
+                {                    
                     item = new PedidoBudiItem
-                    {
+                    {                        
                         NumeroPedido = numeroPedido,
                         Codigo = row.Cell(9).GetString(),
                         Quantidade = row.Cell(13).TryGetValue<int>(out var qtd) ? qtd : 0
@@ -210,8 +219,8 @@ public class CsvPedidoImportService
                     var produto = produtos.FirstOrDefault(p => p.Codigo.Trim() == item.Codigo.Trim());
                     if (produto != null)
                     {
-                        item.NomeProduto = produto.Descricao;                        
-                        item.Custo = produto.ValorUnitario ;                        
+                        item.NomeProduto = produto.Descricao;                                                
+                        item.Custo = produto.ValorUnitario * item.Quantidade;
                     }
                 }
 

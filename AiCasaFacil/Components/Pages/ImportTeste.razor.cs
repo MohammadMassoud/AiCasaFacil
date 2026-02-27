@@ -188,7 +188,7 @@ public partial class ImportTeste
                 g.Key.NomeProduto,
                 g.Sum(x => x.Quantidade)
             ))
-            .OrderBy(x => x.NomeProduto)
+            .OrderBy(x => x.Codigo)
             .ToList();
 
         // 🔹 RESUMO BUDI (baseado nos ITENS)
@@ -200,7 +200,7 @@ public partial class ImportTeste
                 g.Key.NomeProduto,
                 g.Sum(x => x.Quantidade)
             ))
-            .OrderBy(x => x.NomeProduto)
+            .OrderBy(x => x.Codigo)
             .ToList();
 
 
