@@ -3,10 +3,11 @@ using AiCasaFacil.Domain.Entities;
 using AiCasaFacil.Infrastructure.Import;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using static AiCasaFacil.Domain.Enums.Enum;
 
 namespace AiCasaFacil.Components.Pages;
 
-public partial class ImportTeste
+public partial class ImportaPedidosMarketplace
 {
     [Inject] public IProdutoService ProdutoService { get; set; } = default!;
     [Inject] public IAnalisePedidosService AnaliseService { get; set; } = default!;
@@ -15,6 +16,7 @@ public partial class ImportTeste
     private List<PedidosBudi>? pedidosBudi;
     private List<PedidoComparativoViewModel> comparativoPedidos = new();
 
+    private PlataformaImportacao plataformaSelecionada = PlataformaImportacao.ML;
     // Métricas
     private decimal lucroTotal;
     private decimal valorTotalVendas;
@@ -230,6 +232,58 @@ public partial class ImportTeste
                 ));
             }
         }
+    }
+
+    private async Task HandleFile(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        using var memoryStream = new MemoryStream();
+        await file.OpenReadStream().CopyToAsync(memoryStream);
+
+        memoryStream.Position = 0;
+
+        var service = new CsvPedidoImportService(ProdutoService);
+
+        var resultado = service.LerPedidos(memoryStream, plataformaSelecionada);
+
+        switch (resultado)
+        {
+            case List<Pedido> pedidosConvertidos:
+                ProcessarPedidos(pedidosConvertidos);
+                break;
+
+            case List<PedidosBudi> pedidosBudiConvertidos:
+                ProcessarPedidosBudi(pedidosBudiConvertidos);
+                break;
+
+            default:
+                throw new Exception("Tipo de retorno não suportado");
+        }
+    }
+
+    private void ProcessarPedidos(List<Pedido> pedidos)
+    {
+        this.pedidos = pedidos;
+
+        lucroTotal = AnaliseService.CalcularLucroTotal(pedidos);
+        valorTotalVendas = AnaliseService.ValorTotalVendas(pedidos);
+        valorTotalDevido = AnaliseService.ValorTotalDevido(pedidos);
+        mediaMargem = AnaliseService.MediaMargem(pedidos);
+        totalFlex = AnaliseService.TotalFlex(pedidos);
+        quantidadePedidosFlex = AnaliseService.QuantidadePedidosFlex(pedidos);
+        totalTaxa = AnaliseService.TotalTaxa(pedidos);
+        houveDevolucao = AnaliseService.HouveDevolucao(pedidos);
+        resumoPorProduto = AnaliseService.LucrosPorProdutos(pedidos);
+        detalhePedidos = GerarGrid(pedidos);
+    }
+
+    private void ProcessarPedidosBudi(List<PedidosBudi> pedidosBudi)
+    {
+        this.pedidosBudi = pedidosBudi;
+
+        comparativoPedidos = GerarComparativo();
+        GerarResumoProdutos();
     }
 }
 

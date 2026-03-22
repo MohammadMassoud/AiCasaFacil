@@ -10,4 +10,12 @@ public class Enum
         Devolvida = 3,
         Reembolsada = 4
     }
+
+    public enum PlataformaImportacao
+    {
+        ML,
+        Tiktok,        
+        Magalu,
+        Budi
+    }
 }

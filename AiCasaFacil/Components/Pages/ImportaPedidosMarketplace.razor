@@ -1,13 +1,47 @@
-﻿@page "/ImportTeste"
+﻿@page "/ImportaPedidosMarketplace"
 @rendermode InteractiveServer
 @using AiCasaFacil.Domain.Entities
 @using Microsoft.AspNetCore.Components.Forms
+@using static AiCasaFacil.Domain.Enums.Enum
 
 <h3 class="mb-4">Análise de Pedidos</h3>
-<label>CSV ML</label>
-<InputFile OnChange="HandleFileML" class="mb-4" />
-<label>CSV Budi</label>
-<InputFile OnChange="HandleFileBudi" class="mb-4" />
+
+<div class="row">
+    <div class="col-12 d-flex gap-3 mb-3 justify-content-center">
+
+        <div class="platform-card @(plataformaSelecionada == PlataformaImportacao.ML ? "active" : "")"
+             @onclick="() => plataformaSelecionada = PlataformaImportacao.ML">
+            <i class="bi bi-shop"></i>
+            <span>Mercado Livre</span>
+        </div>
+
+        <div class="platform-card @(plataformaSelecionada == PlataformaImportacao.Tiktok ? "active" : "")"
+             @onclick="() => plataformaSelecionada = PlataformaImportacao.Tiktok">
+            <i class="bi bi-tiktok"></i>
+            <span>TikTok</span>
+        </div>
+
+        <div class="platform-card @(plataformaSelecionada == PlataformaImportacao.Magalu ? "active" : "")"
+             @onclick="() => plataformaSelecionada = PlataformaImportacao.Magalu">
+            <i class="bi bi-Magalu"></i>
+            <span>Magalu</span>
+        </div>
+
+        <div class="platform-card @(plataformaSelecionada == PlataformaImportacao.Budi ? "active" : "")"
+             @onclick="() => plataformaSelecionada = PlataformaImportacao.Budi">
+            <i class="bi bi-box-seam"></i>
+            <span>Budi</span>
+        </div>
+        <div class="upload-area text-center pt-3">
+            <i class="bi bi-cloud-upload fs-1"></i>
+            <p class="mb-2">Importar Pedidos Marketplace</p>
+            <InputFile OnChange="HandleFile" class="form-control" />
+        </div>
+    </div>
+
+
+</div>
+
 
 @if (pedidos != null && pedidos.Any() && pedidosBudi==null)
 {
@@ -279,4 +313,49 @@
         </tbody>
     </table>
 }
+<style>
+    .platform-card {
+    width: 130px;
+    height: 100px;
+    border-radius: 16px;
+    border: 2px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.2s;
+    background: #fff;
+    }
 
+    .platform-card i {
+    font-size: 24px;
+    margin-bottom: 5px;
+    }
+
+    .platform-card:hover {
+    border-color: #0d6efd;
+    transform: translateY(-3px);
+    }
+
+    .platform-card.active {
+    border-color: #0d6efd;
+    background: #e7f1ff;
+    font-weight: bold;
+    }
+
+    .upload-area {
+    border: 2px dashed #ccc;
+    border-radius: 12px;
+    background: #fafafa;
+    transition: 0.2s;
+    height:100px;
+    padding:30px;
+    width: 500px;
+    }
+
+    .upload-area:hover {
+    border-color: #0d6efd;
+    background: #f0f7ff;
+    }
+</style>

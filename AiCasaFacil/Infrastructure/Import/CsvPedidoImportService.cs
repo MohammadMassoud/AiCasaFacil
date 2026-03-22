@@ -23,6 +23,16 @@ public class CsvPedidoImportService
         _produtoService = produtoService;
     }
 
+    public object LerPedidos(Stream stream, PlataformaImportacao plataforma)
+    {
+        return plataforma switch
+        {
+            PlataformaImportacao.ML => LerPedidosML(stream),
+            PlataformaImportacao.Tiktok => LerPedidosTiktok(stream),
+            PlataformaImportacao.Budi => LerPedidosBudi(stream),
+            _ => throw new Exception("Plataforma não suportada")
+        };
+    }
     private DateTime ConverterData(string? texto)
     {
         if (string.IsNullOrWhiteSpace(texto))
@@ -243,4 +253,90 @@ public class CsvPedidoImportService
         }
     }
 
+    public List<Pedido> LerPedidosTiktok(Stream stream)
+    {
+        try
+        {
+            var produtos = _produtoService.ListarTodos();
+            var numeroPedido = "";
+            var qtdePacote = 0;
+            var pedidos = new List<Pedido>();
+            using var workbook = new XLWorkbook(stream);
+            var worksheet = workbook.Worksheet(1);
+
+            var rows = worksheet.RangeUsed().RowsUsed();
+
+            foreach (var row in rows)
+            {
+                if (row.Cell(1).IsEmpty())
+                    continue;
+
+                if (!row.Cell(1).GetString().StartsWith("582"))
+                    continue;
+
+                // Verifica se o pedido já existe
+                var pedido = pedidos.FirstOrDefault(p => p.NumeroPedido == numeroPedido);
+                if (qtdePacote <= 0)
+                {
+                    numeroPedido = row.Cell(1).GetString();
+                    pedido = new Pedido
+                    {
+                        NumeroPedido = row.Cell(1).GetString(),
+                        DataPedido = ConverterData(row.Cell(29).GetString()),
+                        ValorBruto = (row.Cell(14).TryGetValue<decimal>(out var vb) ? vb : 0m) - ((row.Cell(17).TryGetValue<decimal>(out var vd) ? vd : 0m) / (row.Cell(12).TryGetValue<decimal>(out var qtde) ? qtde : 0m)),
+                        ValorTotal = (row.Cell(15).TryGetValue<decimal>(out var vt) ? vt : 0m) - (row.Cell(17).TryGetValue<decimal>(out var vtd) ? vtd : 0m),
+                        ValorLiquido = row.Cell(18).TryGetValue<decimal>(out var vl) ? vl : 0m,
+                        FormaEntrega = row.Cell(41).GetString()
+                    };
+
+                    pedidos.Add(pedido);
+                }
+
+                if (row.Cell(3).GetString().StartsWith("Pacote"))
+                {
+                    var match = System.Text.RegularExpressions.Regex.Match(row.Cell(3).GetString(), @"\d+");
+
+                    if (match.Success)
+                        qtdePacote = int.Parse(match.Value);
+                    continue;
+                }
+
+                var item = new PedidoItem
+                {
+                    PacoteId = numeroPedido,
+                    NumeroPedido = row.Cell(1).GetString(),
+                    Produto = row.Cell(9).GetString(),
+                    Codigo = row.Cell(8).GetString().Replace("-",""),
+                    Quantidade = row.Cell(12).TryGetValue<int>(out var qtd) ? qtd : 0,
+                    Custo = 0m
+                };
+
+                var produto = produtos.FirstOrDefault(p => p.Codigo.Trim() == item.Codigo.Trim());
+
+                if (produto != null)
+                {
+                    item.NomeProduto = produto.Descricao;
+                    if (produto.Codigo == "BS341" && item.Produto.Contains("5 Uni"))
+                    {
+                        item.Quantidade = item.Quantidade * 5;
+                    }
+                    else if (produto.Codigo == "BS321")
+                    {
+                        item.Quantidade = item.Quantidade * 2;
+                    }
+
+                    item.Custo = produto.ValorUnitario * item.Quantidade;
+                }
+                qtdePacote = qtdePacote > 0 ? qtdePacote - 1 : qtdePacote;
+                pedido.Itens.Add(item);
+            }
+
+            return pedidos;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            return new List<Pedido>();
+        }
+    }
 }

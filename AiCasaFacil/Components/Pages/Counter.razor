@@ -7,13 +7,26 @@
 
 <p role="status">Current count: @currentCount</p>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
 @code {
     private int currentCount = 0;
 
-    private void IncrementCount()
+    protected override async Task OnInitializedAsync()
     {
-        currentCount++;
+        StateHasChanged();
+        OnAfterRenderAsync(false);
+        StateHasChanged();
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        for (double i = 0; i < 1000000; i++)
+        {
+            currentCount++;
+            StateHasChanged();
+        }
+        StateHasChanged();
+    }
+    
+
 }
