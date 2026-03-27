@@ -84,6 +84,8 @@ public class CsvPedidoImportService
                         FormaEntrega = row.Cell(40).GetString()
                     };
 
+                    if (pedido.FormaEntrega.Contains("Flex"))
+                        pedido.ValorLiquido += 11; 
                     pedidos.Add(pedido);
                 }
 
@@ -101,7 +103,7 @@ public class CsvPedidoImportService
                     PacoteId = numeroPedido,
                     NumeroPedido = row.Cell(1).GetString(),
                     Produto = row.Cell(22).GetString(),
-                    Codigo = row.Cell(20).GetString(),
+                    Codigo = row.Cell(20).GetString().Replace("-",""),
                     Quantidade = row.Cell(7).TryGetValue<int>(out var qtd) ? qtd : 0,
                     Custo = 0m 
                 };

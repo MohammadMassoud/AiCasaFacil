@@ -124,6 +124,7 @@
                 <th>Custo</th>
                 <th>Valor Líquido</th>
                 <th>Lucro</th>
+                <th>Margem</th>
             </tr>
         </thead>
         <tbody>
@@ -137,6 +138,13 @@
                     <td>@item.ValorLiquido.ToString("C")</td>
                     <td class="@(item.Lucro >= 0 ? "text-success" : "text-danger")">
                         @item.Lucro.ToString("C")
+                    </td>
+                    <td class="@(
+                                    item.Margem >= 20 ? "text-success" :                                    
+                                    item.Margem <= 10 ? "text-danger" :
+                                                "text-warning"
+                                )">
+                        @item.Margem.ToString("N2") %
                     </td>
                 </tr>
             }
