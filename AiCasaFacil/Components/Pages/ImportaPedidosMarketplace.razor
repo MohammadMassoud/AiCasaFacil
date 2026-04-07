@@ -121,7 +121,8 @@
                 <th>Código</th>
                 <th>Produto</th>
                 <th>Quantidade</th>
-                <th>Custo</th>
+                <th>Preço Medio</th>
+                <th>Custo</th>                
                 <th>Valor Líquido</th>
                 <th>Lucro</th>
                 <th>Margem</th>
@@ -134,7 +135,8 @@
                     <td>@item.Codigo</td>
                     <td>@item.Produto</td>
                     <td>@item.Quantidade</td>
-                    <td>@item.Custo.ToString("C")</td>
+                    <td>@item.PrecoMedio.ToString("C")</td>
+                    <td>@item.Custo.ToString("C")</td>                    
                     <td>@item.ValorLiquido.ToString("C")</td>
                     <td class="@(item.Lucro >= 0 ? "text-success" : "text-danger")">
                         @item.Lucro.ToString("C")

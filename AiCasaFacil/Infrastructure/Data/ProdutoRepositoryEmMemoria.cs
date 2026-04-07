@@ -7,16 +7,15 @@ public class ProdutoRepositoryEmMemoria : IProdutoRepository
 {
     private readonly List<Produto> _produtos = new()
     {
-        new Produto { Codigo = "BS081", Descricao = "ARVORE DE NATAL 180CM 6", ValorUnitario = 112.90m },
-        new Produto { Codigo = "BS105", Descricao = "GUARDA ROUPA DOBRAVEL", ValorUnitario = 65.90m },
-        new Produto { Codigo = "BS115", Descricao = "COPO DIAMOND TRANSPARENTE", ValorUnitario = 4.65m },
-        new Produto { Codigo = "BS321", Descricao = "PORTA SHAMPOO DE METAL RETO", ValorUnitario = 8.01m },
-        new Produto { Codigo = "BS320", Descricao = "PORTA SHAMPOO DE METAL CANTO", ValorUnitario = 6.20m },
+        new Produto { Codigo = "BS081", Descricao = "ARVORE DE NATAL 180CM 600 GALHOS CX:01", ValorUnitario = 112.90m },
+        new Produto { Codigo = "BS105", Descricao = "GUARDA ROUPA DOBRAVEL ORGANIZADOR CX:6", ValorUnitario = 65.90m },
+        new Produto { Codigo = "BS321", Descricao = "PORTA SHAMPOO RETO", ValorUnitario = 6.20m },
+        new Produto { Codigo = "BS320", Descricao = "PORTA SHAMPOO DE METAL CANTO", ValorUnitario = 8.01m },
         new Produto { Codigo = "BS322", Descricao = "PORTA SHAMPOO PRATELEIRA", ValorUnitario = 14.89m },
         new Produto { Codigo = "BS323", Descricao = "PORTA SHAMPOO PRATELEIRA", ValorUnitario = 15.25m },
-        new Produto { Codigo = "BS324", Descricao = "CABIDEIRO E SAPATEIRA", ValorUnitario = 23.90m },
-        new Produto { Codigo = "BS325", Descricao = "SAPATEIRA 10 ANDARES", ValorUnitario = 18.63m },
-        new Produto { Codigo = "BS326", Descricao = "FATIADOR DE ALIMENTOS", ValorUnitario = 24.43m },
+        new Produto { Codigo = "BS324", Descricao = "CABIDEIRO E SAPATEIRA COM ARMACAO DE METAL 154X60X29,5 CX:18", ValorUnitario = 23.90m },
+        new Produto { Codigo = "BS325", Descricao = "SAPATEIRA 10 ANDARES ARMAÇAO DE METAL 140X50X60 CX:18", ValorUnitario = 18.63m },
+        new Produto { Codigo = "BS326", Descricao = "FATIADOR DE ALMIENTOS DE BANCADA CX: 24 PCS", ValorUnitario = 24.43m },
         new Produto { Codigo = "BS327", Descricao = "MOP SPRAY CX 12", ValorUnitario = 19.00m },
         new Produto { Codigo = "BS328", Descricao = "REFIL PARA MOP SPRAY CX 60", ValorUnitario = 7.49m },
         new Produto { Codigo = "BS331", Descricao = "GUARDA SOL 2.4M", ValorUnitario = 49.67m },

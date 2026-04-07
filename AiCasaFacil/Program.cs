@@ -15,6 +15,7 @@ builder.Services.AddSingleton<IProdutoRepository, ProdutoRepositoryEmMemoria>();
 builder.Services.AddScoped<IProdutoService, ProdutoService>();
 builder.Services.AddScoped<IAnalisePedidosService, AnalisePedidosService>();
 builder.Services.AddScoped<ProdutoIAService>();
+builder.Services.AddScoped<PedidoSessaoService>();
 builder.Services.AddScoped<PedidoIAService>();
 builder.Services.AddScoped<CsvPedidoImportService>();
 builder.Services.Configure<OllamaSettings>(

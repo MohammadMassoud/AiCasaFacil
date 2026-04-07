@@ -1,4 +1,5 @@
 ﻿using AiCasaFacil.Application.Interfaces;
+using AiCasaFacil.Application.Services;
 using AiCasaFacil.Domain.Entities;
 using AiCasaFacil.Infrastructure.Import;
 using Microsoft.AspNetCore.Components;
@@ -11,6 +12,7 @@ public partial class ImportaPedidosMarketplace
 {
     [Inject] public IProdutoService ProdutoService { get; set; } = default!;
     [Inject] public IAnalisePedidosService AnaliseService { get; set; } = default!;
+    [Inject] public PedidoSessaoService SessaoService { get; set; } = default!;
 
     private List<Pedido>? pedidos;
     private List<PedidosBudi>? pedidosBudi;
@@ -50,6 +52,19 @@ public partial class ImportaPedidosMarketplace
         public decimal Margem { get; set; }
     }
 
+    protected override void OnInitialized()
+    {
+        // Se já tem pedidos na sessão, restaura o estado da página
+        if (SessaoService.TemPedidos)
+        {
+            ProcessarPedidos(SessaoService.Pedidos.ToList());
+        }
+
+        if (SessaoService.TemPedidosBudi)
+        {
+            ProcessarPedidosBudi(SessaoService.PedidosBudi.ToList());
+        }
+    }
     public List<PedidoGridViewModel> GerarGrid(List<Pedido> pedidos)
     {
         var lista = new List<PedidoGridViewModel>();
@@ -226,7 +241,7 @@ public partial class ImportaPedidosMarketplace
             {
                 diferencas.Add((
                     codigo,
-                    ml.Produto ?? "Sem nome",
+                    ml.Produto ?? budi.Produto?? "Sem nome",
                     qtdML,
                     qtdBudi
                 ));
@@ -266,6 +281,8 @@ public partial class ImportaPedidosMarketplace
     {
         this.pedidos = pedidos;
 
+        SessaoService.SalvarPedidos(pedidos);
+
         lucroTotal = AnaliseService.CalcularLucroTotal(pedidos);
         valorTotalVendas = AnaliseService.ValorTotalVendas(pedidos);
         valorTotalDevido = AnaliseService.ValorTotalDevido(pedidos);
@@ -281,6 +298,8 @@ public partial class ImportaPedidosMarketplace
     private void ProcessarPedidosBudi(List<PedidosBudi> pedidosBudi)
     {
         this.pedidosBudi = pedidosBudi;
+
+        SessaoService.SalvarPedidosBudi(pedidosBudi);
 
         comparativoPedidos = GerarComparativo();
         GerarResumoProdutos();

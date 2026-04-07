@@ -1,6 +1,205 @@
-﻿@page "/"
+﻿@* AiCasaFacil/Components/Pages/Home.razor *@
+@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>AiCasaFacil</PageTitle>
 
-<h1>Hello, world!</h1>
-Welcome to your new app.
+<div class="home-hero">
+    <div class="hero-icon">🏠</div>
+    <div>
+        <h1 class="hero-title">AiCasaFacil</h1>
+        <p class="hero-sub">Análise inteligente de pedidos para marketplace</p>
+    </div>
+    <div class="ms-auto">
+        <span class="badge-pill badge-green">IA Ativa</span>
+    </div>
+</div>
+
+<p class="section-title">Plataformas suportadas</p>
+<div class="plataform-row">
+    <div class="plat-tag"><div class="plat-dot" style="background:#FFE600;"></div>Mercado Livre</div>
+    <div class="plat-tag"><div class="plat-dot" style="background:#FF0050;"></div>TikTok Shop</div>
+    <div class="plat-tag"><div class="plat-dot" style="background:#0086FF;"></div>Magalu</div>
+    <div class="plat-tag"><div class="plat-dot" style="background:#A855F7;"></div>Budi</div>
+</div>
+
+<p class="section-title">Acesso rápido</p>
+<div class="cards-grid">
+    <a href="ImportaPedidosMarketplace" class="nav-card">
+        <div class="nav-card-icon icon-blue">📥</div>
+        <p class="nav-card-label">Importar pedidos</p>
+        <p class="nav-card-desc">Carregue planilhas das plataformas</p>
+    </a>
+    <a href="ChatIA" class="nav-card">
+        <div class="nav-card-icon icon-purple">🤖</div>
+        <p class="nav-card-label">Chat IA</p>
+        <p class="nav-card-desc">Pergunte sobre seus pedidos</p>
+    </a>
+    <a href="Produtos" class="nav-card">
+        <div class="nav-card-icon icon-amber">📦</div>
+        <p class="nav-card-label">Produtos</p>
+        <p class="nav-card-desc">Gerencie seu catálogo</p>
+    </a>
+</div>
+
+<p class="section-title">Como usar</p>
+<div class="steps">
+    <div class="step">
+        <div class="step-num">1</div>
+        <div>
+            <p class="step-title">Importe a planilha</p>
+            <p class="step-desc">Vá em "Importar Pedidos" e carregue o arquivo da plataforma desejada</p>
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-num">2</div>
+        <div>
+            <p class="step-title">Analise o dashboard</p>
+            <p class="step-desc">Veja lucro, margem, taxas e desempenho por produto automaticamente</p>
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-num">3</div>
+        <div>
+            <p class="step-title">Pergunte à IA</p>
+            <p class="step-desc">Acesse o Chat IA e faça perguntas sobre seus dados em linguagem natural</p>
+        </div>
+    </div>
+</div>
+
+
+<style>
+
+    /* AiCasaFacil/Components/Pages/Home.razor.css */
+.home-hero {
+    background: linear-gradient(135deg, #052767 0%, #3a0647 100%);
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    color: white;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.hero-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    flex-shrink: 0;
+}
+
+.hero-title { font-size: 26px; font-weight: 500; margin: 0 0 4px; }
+.hero-sub { font-size: 14px; opacity: 0.75; margin: 0; }
+
+.section-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin: 1.5rem 0 12px;
+}
+
+.plataform-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
+
+.plat-tag {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 99px;
+    padding: 4px 14px;
+    font-size: 12px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.plat-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.nav-card {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.25rem 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.15s, transform 0.15s;
+}
+
+.nav-card:hover {
+    border-color: #052767;
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+.nav-card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.icon-blue   { background: #E6F1FB; }
+.icon-purple { background: #EEEDFE; }
+.icon-amber  { background: #FAEEDA; }
+
+.nav-card-label { font-size: 14px; font-weight: 500; color: #1a1a1a; margin: 0; }
+.nav-card-desc  { font-size: 12px; color: #888; margin: 0; }
+
+.badge-pill {
+    display: inline-block;
+    font-size: 11px;
+    padding: 3px 12px;
+    border-radius: 99px;
+    font-weight: 500;
+}
+
+.badge-green { background: #EAF3DE; color: #3B6D11; }
+
+.steps { display: flex; flex-direction: column; gap: 8px; }
+
+.step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+}
+
+.step-num {
+    width: 24px;
+    height: 24px;
+    background: #EEEDFE;
+    color: #534AB7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.step-title { margin: 0; font-size: 14px; font-weight: 500; color: #1a1a1a; }
+.step-desc  { margin: 0; font-size: 12px; color: #888; }
+</style>

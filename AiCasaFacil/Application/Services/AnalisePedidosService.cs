@@ -88,6 +88,7 @@ public class AnalisePedidosService : IAnalisePedidosService
                     Produto = g.Key.NomeProduto,
                     Quantidade = g.Sum(x => x.item.Quantidade),
                     Custo = g.Sum(x => x.item.Custo),
+                    PrecoMedio = pedidosGrupo.Average(x => x.ValorBruto),
                     ValorLiquido = pedidosGrupo.Sum(p => p.ValorLiquido),
                     Lucro = pedidosGrupo.Sum(p => p.Lucro),
                     Margem = pedidosGrupo.Sum(p => p.ValorLiquido) > 0? (pedidosGrupo.Sum(p => p.Lucro) / pedidosGrupo.Sum(p => p.ValorLiquido)) * 100: 0
