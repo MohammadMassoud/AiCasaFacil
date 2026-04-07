@@ -46,7 +46,7 @@ public class AnalisePedidosService : IAnalisePedidosService
 
 
     public decimal ValorTotalVendas(List<Pedido> pedidos)
-        => pedidos?.Sum(p => p.ValorLiquido) ?? 0;
+        => pedidos?.Sum(p => p.ValorTotal) ?? 0;
 
     public decimal ValorTotalDevido(List<Pedido> pedidos)
         => pedidos?.Sum(p => p.CustoTotal) ?? 0;
