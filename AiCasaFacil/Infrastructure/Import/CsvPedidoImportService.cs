@@ -78,10 +78,10 @@ public class CsvPedidoImportService
                     {                        
                         NumeroPedido = row.Cell(1).GetString(),
                         DataPedido = ConverterData(row.Cell(2).GetString()),
-                        ValorBruto = row.Cell(25).TryGetValue<decimal>(out var vb) ? vb : 0m,
-                        ValorTotal = row.Cell(8).TryGetValue<decimal>(out var vt) ? vt : 0m,
-                        ValorLiquido = row.Cell(18).TryGetValue<decimal>(out var vl) ? vl : 0m,
-                        FormaEntrega = row.Cell(41).GetString()
+                        ValorBruto = row.Cell(27).TryGetValue<decimal>(out var vb) ? vb : 0m,
+                        ValorTotal = row.Cell(9).TryGetValue<decimal>(out var vt) ? vt : 0m,
+                        ValorLiquido = row.Cell(19).TryGetValue<decimal>(out var vl) ? vl : 0m,
+                        FormaEntrega = row.Cell(43).GetString()
                     };
 
                     if (pedido.FormaEntrega.Contains("Flex") && pedido.ValorBruto > 79)
@@ -92,7 +92,7 @@ public class CsvPedidoImportService
                     pedidos.Add(pedido);
                 }
 
-                if(row.Cell(3).GetString().StartsWith("Pacote"))
+                if(row.Cell(4).GetString().StartsWith("Pacote"))
                 {
                     var match = System.Text.RegularExpressions.Regex.Match(row.Cell(3).GetString(), @"\d+");
 
@@ -105,9 +105,9 @@ public class CsvPedidoImportService
                 {                    
                     PacoteId = numeroPedido,
                     NumeroPedido = row.Cell(1).GetString(),
-                    Produto = row.Cell(23).GetString(),
-                    Codigo = row.Cell(21).GetString().Replace("-",""),
-                    Quantidade = row.Cell(7).TryGetValue<int>(out var qtd) ? qtd : 0,
+                    Produto = row.Cell(25).GetString(),
+                    Codigo = row.Cell(23).GetString().Replace("-",""),
+                    Quantidade = row.Cell(8).TryGetValue<int>(out var qtd) ? qtd : 0,
                     Custo = 0m 
                 };
 
@@ -278,7 +278,7 @@ public class CsvPedidoImportService
                 if (row.Cell(1).IsEmpty())
                     continue;
 
-                if (!row.Cell(1).GetString().StartsWith("582"))
+                if (!row.Cell(1).GetString().StartsWith("5"))
                     continue;
 
                 // Verifica se o pedido já existe
