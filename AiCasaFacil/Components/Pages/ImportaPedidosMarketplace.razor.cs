@@ -81,10 +81,7 @@ public partial class ImportaPedidosMarketplace
 
                 var lucroItem = pedido.Lucro * proporcao;
 
-                var margemItem = pedido.ValorBruto == 0
-                    ? 0
-                    : Math.Round((lucroItem / pedido.ValorBruto) * 100, 2);
-
+                
                 lista.Add(new PedidoGridViewModel
                 {
                     NumeroPedido = pedido.NumeroPedido,
@@ -101,7 +98,7 @@ public partial class ImportaPedidosMarketplace
                     Flex = pedido.Flex,
 
                     Lucro = lucroItem,
-                    Margem = margemItem
+                    Margem = pedido.Margem
                 });
             }
         }
@@ -254,7 +251,10 @@ public partial class ImportaPedidosMarketplace
         var file = e.File;
 
         using var memoryStream = new MemoryStream();
-        await file.OpenReadStream().CopyToAsync(memoryStream);
+        // Exemplo: permitir até 10MB
+        long maxSize = 10 * 1024 * 1024;
+
+        await file.OpenReadStream(maxSize).CopyToAsync(memoryStream);
 
         memoryStream.Position = 0;
 

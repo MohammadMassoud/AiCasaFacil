@@ -11,6 +11,8 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using static AiCasaFacil.Domain.Enums.Enum;
+using System.Globalization;
+using System.Text;
 
 namespace AiCasaFacil.Infrastructure.Import;
 
@@ -48,6 +50,91 @@ public class CsvPedidoImportService
         return DateTime.MinValue;
     }
 
+    string Normalizar(string texto)
+    {
+        if (string.IsNullOrWhiteSpace(texto)) return "";
+
+        texto = texto.ToLower().Trim();
+
+        var normalized = texto.Normalize(NormalizationForm.FormD);
+        var sb = new StringBuilder();
+
+        foreach (var c in normalized)
+        {
+            var unicodeCategory = Char.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                sb.Append(c);
+        }
+
+        return sb.ToString().Normalize(NormalizationForm.FormC);
+    }
+
+    Produto EncontrarProdutoPorDescricao(string descricaoPlanilha)
+    {
+        var palavrasIgnoradas = new HashSet<string>
+    {
+        "kit", "de", "com", "para", "cor", "branco", "preto",
+        "unidade", "pcs", "peças", "organizador", "organizadores"
+    };
+
+        var descNormalizada = Normalizar(descricaoPlanilha);
+
+        var palavrasPlanilha = descNormalizada
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Where(p => !palavrasIgnoradas.Contains(p))
+            .ToList();
+
+        Produto melhorMatch = null;
+        int maiorScore = int.MinValue;
+
+        foreach (var produto in _produtoService.ListarTodos())
+        {
+            var descProduto = Normalizar(produto.Descricao);
+
+            var palavrasProduto = descProduto
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                .Where(p => !palavrasIgnoradas.Contains(p))
+                .ToList();
+
+            int score = 0;
+
+            // 🔥 PRIMEIRA palavra relevante
+            if (palavrasPlanilha.Any() && palavrasProduto.Any())
+            {
+                if (palavrasPlanilha.First() == palavrasProduto.First())
+                    score += 4;
+            }
+
+            // 👍 palavras em comum (principal fator)
+            int matches = 0;
+
+            foreach (var palavra in palavrasPlanilha)
+            {
+                if (palavrasProduto.Contains(palavra))
+                {
+                    score += 2;
+                    matches++;
+                }
+            }
+
+            // ❗ REGRA IMPORTANTE: precisa ter pelo menos 1 match real
+            if (matches == 0)
+                continue;
+
+            // ❌ penalidade leve (não destrutiva)
+            int faltantes = palavrasPlanilha.Count - matches;
+            score -= faltantes * 0; // 👉 desativa penalidade por enquanto
+
+            if (score > maiorScore)
+            {
+                maiorScore = score;
+                melhorMatch = produto;
+            }
+        }
+
+        return melhorMatch;
+    }
+
     public List<Pedido> LerPedidosML(Stream stream)
     {
         try
@@ -69,6 +156,9 @@ public class CsvPedidoImportService
                 if (!row.Cell(1).GetString().StartsWith("20000"))
                     continue;
 
+
+                if (row.Cell(1).GetString().StartsWith("2000012789440231"))
+                    Console.WriteLine("chegou");
                 // Verifica se o pedido já existe
                 var pedido = pedidos.FirstOrDefault(p => p.NumeroPedido == numeroPedido);
                 if (qtdePacote <=0)
@@ -84,10 +174,10 @@ public class CsvPedidoImportService
                         FormaEntrega = row.Cell(43).GetString()
                     };
 
-                    if (pedido.FormaEntrega.Contains("Flex") && pedido.ValorBruto > 79)
-                        pedido.ValorLiquido += 1.1m; 
-                    else if (pedido.FormaEntrega.Contains("Flex") && pedido.ValorBruto < 79)
-                        pedido.ValorLiquido += 11m;
+                    //if (pedido.FormaEntrega.Contains("Flex") && pedido.ValorBruto > 79)
+                    //    pedido.ValorLiquido += 1.1m; 
+                    //else if (pedido.FormaEntrega.Contains("Flex") && pedido.ValorBruto < 79)
+                    //    pedido.ValorLiquido += 11m;
                     
                     pedidos.Add(pedido);
                 }
@@ -110,6 +200,16 @@ public class CsvPedidoImportService
                     Quantidade = row.Cell(8).TryGetValue<int>(out var qtd) ? qtd : 0,
                     Custo = 0m 
                 };
+
+                if (string.IsNullOrWhiteSpace(item.Codigo))
+                {
+                    var produtoEncontrado = EncontrarProdutoPorDescricao(item.Produto);
+
+                    if (produtoEncontrado != null)
+                    {
+                        item.Codigo = produtoEncontrado.Codigo;
+                    }
+                }
 
                 var produto = produtos.FirstOrDefault(p => p.Codigo.Trim() == item.Codigo.Trim());
 

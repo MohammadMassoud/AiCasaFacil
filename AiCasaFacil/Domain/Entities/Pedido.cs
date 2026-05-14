@@ -16,8 +16,8 @@ namespace AiCasaFacil.Domain.Entities
         public decimal CustoTotal => Itens.Sum(i => i.Custo);
         public decimal Flex => FormaEntrega.Contains("Flex")? 12 : 0;
         public decimal Taxa => (ValorTotal - ValorLiquido) ;
-        public decimal Lucro => (ValorLiquido - CustoTotal) - Flex;
-        public decimal Margem => ValorBruto == 0        ? 0        : Math.Round((Lucro / ValorBruto) * 100, 2);
+        public decimal Lucro => ValorLiquido==0?0:((ValorLiquido - CustoTotal) - Flex);
+        public decimal Margem => ValorLiquido == 0 ? 0: Math.Round((Lucro / ValorLiquido) * 100, 2);
 
         public List<PedidoItem> Itens { get; set; } = new();
     }

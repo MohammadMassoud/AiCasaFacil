@@ -1,6 +1,7 @@
 ﻿using AiCasaFacil.Application.Interfaces;
 using AiCasaFacil.Domain.Entities;
 
+
 namespace AiCasaFacil.Infrastructure.Data;
 
 public class ProdutoRepositoryEmMemoria : IProdutoRepository
